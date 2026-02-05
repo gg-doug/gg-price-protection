@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,58 +16,20 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <style>
-        /* Ensure date inputs display properly on mobile */
-        input[type="date"] {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-color: white;
+        input[type="date"], input[type="number"], select {
+            color-scheme: light dark;
         }
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-            opacity: 0.6;
-        }
-        input[type="date"]::-webkit-inner-spin-button,
-        input[type="date"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        /* Prevent zoom on input focus on iOS */
         @supports (-webkit-touch-callout: none) {
             input, select, textarea {
                 font-size: 16px !important;
             }
         }
-        /* Dark mode variables */
-        :root {
-            --bg-primary: #f3f4f6;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #f9fafb;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --border-color: #d1d5db;
-            --header-bg: linear-gradient(to right, #2563eb, #4f46e5);
-        }
-        [data-theme="dark"] {
-            --bg-primary: #111827;
-            --bg-secondary: #1f2937;
-            --bg-tertiary: #374151;
-            --text-primary: #f9fafb;
-            --text-secondary: #d1d5db;
-            --border-color: #4b5563;
-            --header-bg: linear-gradient(to right, #1e40af, #3730a3);
-        }
-        body {
-            transition: background-color 0.3s ease;
-        }
-        [data-theme="dark"] input[type="date"],
-        [data-theme="dark"] input[type="number"],
-        [data-theme="dark"] select {
-            background-color: #374151 !important;
-            color: #f9fafb !important;
-        }
-        /* PWA install prompt styling */
         .install-prompt {
             position: fixed;
             bottom: 20px;
@@ -83,7 +46,7 @@
         .install-prompt.show {
             display: block;
         }
-        [data-theme="dark"] .install-prompt {
+        .dark .install-prompt {
             background: #1f2937;
             color: #f9fafb;
         }
@@ -92,521 +55,455 @@
 <body>
     <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+```
+<script type="text/babel">
+    const { useState, useEffect } = React;
 
-        // Lucide Icons as inline SVGs
-        const Calculator = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="2" width="16" height="20" rx="2"></rect>
-                <line x1="8" y1="6" x2="16" y2="6"></line>
-                <line x1="16" y1="14" x2="16" y2="18"></line>
-                <line x1="8" y1="14" x2="8" y2="18"></line>
-                <line x1="12" y1="14" x2="12" y2="18"></line>
-                <line x1="8" y1="10" x2="16" y2="10"></line>
-            </svg>
-        );
+    // Icons
+    const Calculator = ({ className }) => (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+            <line x1="8" y1="6" x2="16" y2="6"></line>
+            <line x1="16" y1="14" x2="16" y2="18"></line>
+            <line x1="8" y1="14" x2="8" y2="18"></line>
+            <line x1="12" y1="14" x2="12" y2="18"></line>
+            <line x1="8" y1="10" x2="16" y2="10"></line>
+        </svg>
+    );
 
-        const DollarSign = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-        );
+    const DollarSign = ({ className }) => (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+    );
 
-        const Calendar = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-        );
+    const Calendar = ({ className }) => (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+    );
 
-        const Award = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="8" r="7"></circle>
-                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-            </svg>
-        );
+    const Award = ({ className }) => (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="7"></circle>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+        </svg>
+    );
 
-        const Building2 = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 21h18"></path>
-                <path d="M9 8h1"></path>
-                <path d="M9 12h1"></path>
-                <path d="M9 16h1"></path>
-                <path d="M14 8h1"></path>
-                <path d="M14 12h1"></path>
-                <path d="M14 16h1"></path>
-                <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
-            </svg>
-        );
+    const Building2 = ({ className }) => (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M3 21h18"></path>
+            <path d="M9 8h1"></path>
+            <path d="M9 12h1"></path>
+            <path d="M9 16h1"></path>
+            <path d="M14 8h1"></path>
+            <path d="M14 12h1"></path>
+            <path d="M14 16h1"></path>
+            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path>
+        </svg>
+    );
 
-        const Moon = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        );
+    const Moon = ({ className }) => (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    );
 
-        const Sun = ({ className }) => (
-            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-        );
+    const Sun = ({ className }) => (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    );
 
-        function PricingCalculator() {
-            const [partner, setPartner] = useState('');
-            const [incumbentPrice, setIncumbentPrice] = useState('');
-            const [contractDate, setContractDate] = useState('');
-            const [dealType, setDealType] = useState('new-logo');
-            const [darkMode, setDarkMode] = useState(() => {
-                const saved = localStorage.getItem('darkMode');
-                return saved === 'true';
-            });
+    function PricingCalculator() {
+        const [partner, setPartner] = useState('');
+        const [incumbentPrice, setIncumbentPrice] = useState('');
+        const [contractDate, setContractDate] = useState('');
+        const [dealType, setDealType] = useState('new-logo');
+        const [darkMode, setDarkMode] = useState(() => {
+            const saved = localStorage.getItem('darkMode');
+            return saved === 'true';
+        });
 
-            useEffect(() => {
-                if (darkMode) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                } else {
-                    document.documentElement.removeAttribute('data-theme');
-                }
-                localStorage.setItem('darkMode', darkMode);
-            }, [darkMode]);
+        useEffect(() => {
+            if (darkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('darkMode', darkMode);
+        }, [darkMode]);
 
-            const toggleDarkMode = () => {
-                setDarkMode(!darkMode);
+        const toggleDarkMode = () => {
+            setDarkMode(!darkMode);
+        };
+
+        const partnerTiers = {
+            'CDW': 'enterprise',
+            'Trafera': 'growth',
+            'Bluum': 'growth',
+            'SHI': 'growth',
+            'Howard': 'growth',
+            'BorderLAN': 'growth',
+            'OETC': 'growth',
+            'UDT': 'growth',
+            'Connection': 'territory',
+            'Fortnet Security': 'territory',
+            'Journey Ed': 'territory',
+            'Logisoft': 'territory',
+            'Stryke Security Inc': 'territory',
+            'STS Education': 'territory',
+            'TIG': 'territory',
+            'Twotrees Technologies': 'territory',
+            'Whalley Computer Associates Inc': 'territory',
+            'WIRED! Technology Partners': 'territory'
+        };
+
+        const partners = [
+            'Bluum', 'BorderLAN', 'CDW', 'Connection', 'Fortnet Security', 'Howard',
+            'Journey Ed', 'Logisoft', 'OETC', 'SHI', 'Stryke Security Inc', 'STS Education',
+            'TIG', 'Trafera', 'Twotrees Technologies', 'UDT',
+            'Whalley Computer Associates Inc', 'WIRED! Technology Partners', 'Other (Authorized)'
+        ];
+
+        const getPartnerTier = (partnerName) => {
+            if (!partnerName) return null;
+            return partnerTiers[partnerName] || 'authorized';
+        };
+
+        const getTierDisplayName = (tier) => {
+            const tierNames = {
+                'enterprise': 'Enterprise Partner',
+                'growth': 'Growth Partner',
+                'territory': 'Territory Partner',
+                'authorized': 'Authorized Partner'
             };
+            return tierNames[tier] || '';
+        };
 
-            // Partner tier mapping
-            const partnerTiers = {
-                'CDW': 'enterprise',
-                'Trafera': 'growth',
-                'Bluum': 'growth',
-                'SHI': 'growth',
-                'Howard': 'growth',
-                'BorderLAN': 'growth',
-                'OETC': 'growth',
-                'UDT': 'growth',
-                'Connection': 'territory',
-                'Fortnet Security': 'territory',
-                'Journey Ed': 'territory',
-                'Logisoft': 'territory',
-                'Stryke Security Inc': 'territory',
-                'STS Education': 'territory',
-                'TIG': 'territory',
-                'Twotrees Technologies': 'territory',
-                'Whalley Computer Associates Inc': 'territory',
-                'WIRED! Technology Partners': 'territory'
+        const calculatePricing = () => {
+            if (!partner || !incumbentPrice || !contractDate) return null;
+            const price = parseFloat(incumbentPrice);
+            if (isNaN(price) || price <= 0) return null;
+
+            const selectedDate = new Date(contractDate);
+            const legacyCutoff = new Date('2026-02-09');
+            const isLegacy = selectedDate < legacyCutoff;
+            const partnerTier = getPartnerTier(partner);
+            let discountRate = 0;
+
+            if (partnerTier === 'enterprise' || partnerTier === 'growth') {
+                if (isLegacy) discountRate = 0.15;
+                else if (dealType === 'new-logo' || dealType === 'cross-sell') discountRate = 0.25;
+                else if (dealType === 'renewal') discountRate = 0.20;
+            } else if (partnerTier === 'territory') {
+                if (isLegacy) discountRate = 0.15;
+                else if (dealType === 'new-logo' || dealType === 'cross-sell') discountRate = 0.20;
+                else if (dealType === 'renewal') discountRate = 0.15;
+            } else if (partnerTier === 'authorized') {
+                discountRate = 0.15;
+            }
+
+            return {
+                incumbentPrice: price,
+                discountRate: discountRate * 100,
+                discountAmount: price * discountRate,
+                nonIncumbentPrice: price + (price * discountRate),
+                dealType, isLegacy,
+                partnerTier, partnerName: partner
             };
+        };
 
-            const partners = [
-                'Bluum',
-                'BorderLAN',
-                'CDW',
-                'Connection',
-                'Fortnet Security',
-                'Howard',
-                'Journey Ed',
-                'Logisoft',
-                'OETC',
-                'SHI',
-                'Stryke Security Inc',
-                'STS Education',
-                'TIG',
-                'Trafera',
-                'Twotrees Technologies',
-                'UDT',
-                'Whalley Computer Associates Inc',
-                'WIRED! Technology Partners',
-                'Other (Authorized)'
-            ];
+        const result = calculatePricing();
+        const formatCurrency = (amount) => new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2
+        }).format(amount);
 
-            const getPartnerTier = (partnerName) => {
-                if (!partnerName) return null;
-                return partnerTiers[partnerName] || 'authorized';
-            };
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8 transition-colors duration-300">
+                <div className="max-w-4xl mx-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-800 dark:to-indigo-900 p-8 text-white">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-3">
+                                    <Calculator className="w-8 h-8" />
+                                    <h1 className="text-3xl font-bold">GoGuardian Price Protection Calculator</h1>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={toggleDarkMode}
+                                        className="p-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition"
+                                        aria-label="Toggle dark mode"
+                                    >
+                                        {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                                    </button>
+                                    <div className="text-blue-100 text-sm font-semibold">v1.21</div>
+                                </div>
+                            </div>
+                            <p className="text-blue-100 mb-3">Calculate competitive pricing with partner tier discounts</p>
+                            <p className="text-blue-200 text-sm italic leading-relaxed">
+                                Note: Price protection sets the floor price we won't quote under—it's not the customer price. 
+                                Resellers set their own margins, and many choose to price well below their protection level.
+                            </p>
+                        </div>
 
-            const getTierDisplayName = (tier) => {
-                const tierNames = {
-                    'enterprise': 'Enterprise Partner',
-                    'growth': 'Growth Partner',
-                    'territory': 'Territory Partner',
-                    'authorized': 'Authorized Partner'
-                };
-                return tierNames[tier] || '';
-            };
+                        <div className="p-8">
+                            <div className="grid md:grid-cols-2 gap-6 mb-8">
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-100 mb-2">
+                                        <Building2 className="w-4 h-4" />
+                                        Partner
+                                    </label>
+                                    <select
+                                        value={partner}
+                                        onChange={(e) => setPartner(e.target.value)}
+                                        className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    >
+                                        <option value="">Select a partner...</option>
+                                        {partners.map((p) => <option key={p} value={p}>{p}</option>)}
+                                    </select>
+                                </div>
 
-            const calculatePricing = () => {
-                if (!partner || !incumbentPrice || !contractDate) {
-                    return null;
-                }
-
-                const price = parseFloat(incumbentPrice);
-                if (isNaN(price) || price <= 0) {
-                    return null;
-                }
-
-                const selectedDate = new Date(contractDate);
-                const legacyCutoff = new Date('2026-02-09');
-                const isLegacy = selectedDate < legacyCutoff;
-
-                const partnerTier = getPartnerTier(partner);
-                let discountRate = 0;
-
-                if (partnerTier === 'enterprise' || partnerTier === 'growth') {
-                    if (isLegacy) {
-                        discountRate = 0.15;
-                    } else if (dealType === 'new-logo' || dealType === 'cross-sell') {
-                        discountRate = 0.25;
-                    } else if (dealType === 'renewal') {
-                        discountRate = 0.20;
-                    }
-                } else if (partnerTier === 'territory') {
-                    if (isLegacy) {
-                        discountRate = 0.15;
-                    } else if (dealType === 'new-logo' || dealType === 'cross-sell') {
-                        discountRate = 0.20;
-                    } else if (dealType === 'renewal') {
-                        discountRate = 0.15;
-                    }
-                } else if (partnerTier === 'authorized') {
-                    discountRate = 0.15;
-                }
-
-                const discountAmount = price * discountRate;
-                const nonIncumbentPrice = price + discountAmount;
-
-                return {
-                    incumbentPrice: price,
-                    discountRate: discountRate * 100,
-                    discountAmount: discountAmount,
-                    nonIncumbentPrice: nonIncumbentPrice,
-                    dealType: dealType,
-                    isLegacy: isLegacy,
-                    partnerTier: partnerTier,
-                    partnerName: partner
-                };
-            };
-
-            const result = calculatePricing();
-
-            const formatCurrency = (amount) => {
-                return new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    minimumFractionDigits: 2
-                }).format(amount);
-            };
-
-            return (
-                <div className="min-h-screen p-8" style={{ background: 'var(--bg-primary)', transition: 'background-color 0.3s ease' }}>
-                    <div className="max-w-4xl mx-auto">
-                        <div className="rounded-2xl shadow-2xl overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
-                            {/* Header */}
-                            <div style={{ background: 'var(--header-bg)' }} className="p-8 text-white">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-3">
-                                        <Calculator className="w-8 h-8" />
-                                        <h1 className="text-3xl font-bold">GoGuardian Price Protection Calculator</h1>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={toggleDarkMode}
-                                            className="p-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition"
-                                            aria-label="Toggle dark mode"
-                                        >
-                                            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                                        </button>
-                                        <div className="text-blue-100 text-sm font-semibold">v1.20</div>
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-100 mb-2">
+                                        <Award className="w-4 h-4" />
+                                        Partner Tier
+                                    </label>
+                                    <div className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center">
+                                        {partner ? (
+                                            <span className="font-semibold text-gray-900 dark:text-gray-100">
+                                                {getTierDisplayName(getPartnerTier(partner))}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-500 dark:text-gray-400 italic">Select a partner first</span>
+                                        )}
                                     </div>
                                 </div>
-                                <p className="text-blue-100 mb-3">Calculate competitive pricing with partner tier discounts</p>
-                                <p className="text-blue-200 text-sm italic leading-relaxed">
-                                    Note: Price protection sets the floor price we won't quote under—it's not the customer price. 
-                                    Resellers set their own margins, and many choose to price well below their protection level.
-                                </p>
+
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-100 mb-2">
+                                        <Award className="w-4 h-4" />
+                                        Deal Type
+                                    </label>
+                                    <select
+                                        value={dealType}
+                                        onChange={(e) => setDealType(e.target.value)}
+                                        className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    >
+                                        <option value="new-logo">New Logo</option>
+                                        <option value="cross-sell">Cross-Sell</option>
+                                        <option value="renewal">Renewal and Expansion</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-100 mb-2">
+                                        <DollarSign className="w-4 h-4" />
+                                        Incumbent Price
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={incumbentPrice}
+                                        onChange={(e) => setIncumbentPrice(e.target.value)}
+                                        placeholder="Enter incumbent price"
+                                        className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                        step="0.01"
+                                        min="0"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-100 mb-2">
+                                        <Calendar className="w-4 h-4" />
+                                        Original Contract Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={contractDate}
+                                        onChange={(e) => setContractDate(e.target.value)}
+                                        className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-blue-500 focus:outline-none transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                        style={{ minHeight: '48px' }}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-100 mb-2">
+                                        <DollarSign className="w-4 h-4" />
+                                        Non-Incumbent Price
+                                    </label>
+                                    <div className={`w-full px-4 py-3 border-2 rounded-lg flex items-center ${result ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700' : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600'}`}>
+                                        {result ? (
+                                            <span className="text-2xl font-bold text-green-700 dark:text-green-400">
+                                                {formatCurrency(result.nonIncumbentPrice)}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-500 dark:text-gray-400 italic">Fill all fields above</span>
+                                        )}
+                                    </div>
+                                    {result && result.isLegacy && (
+                                        <p className="mt-1 text-xs text-amber-700 dark:text-amber-400 font-semibold">
+                                            ⚠️ Legacy deal (before Feb 9, 2026)
+                                        </p>
+                                    )}
+                                    {result && (
+                                        <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                                            {result.discountRate}% price protection applied
+                                        </p>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Form */}
-                            <div className="p-8">
-                                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                                    {/* Row 1: Partner Selection and Partner Tier */}
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                                            <Building2 className="w-4 h-4" />
-                                            Partner
-                                        </label>
-                                        <select
-                                            value={partner}
-                                            onChange={(e) => setPartner(e.target.value)}
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition"
-                                        >
-                                            <option value="">Select a partner...</option>
-                                            {partners.map((p) => (
-                                                <option key={p} value={p}>{p}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                                            <Award className="w-4 h-4" />
-                                            Partner Tier
-                                        </label>
-                                        <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-gray-50 flex items-center">
-                                            {partner ? (
-                                                <span className="font-semibold text-gray-900">
-                                                    {getTierDisplayName(getPartnerTier(partner))}
-                                                </span>
-                                            ) : (
-                                                <span className="text-gray-400 italic">Select a partner first</span>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Row 2: Deal Type and Incumbent Price */}
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                                            <Award className="w-4 h-4" />
-                                            Deal Type
-                                        </label>
-                                        <select
-                                            value={dealType}
-                                            onChange={(e) => setDealType(e.target.value)}
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition"
-                                        >
-                                            <option value="new-logo">New Logo</option>
-                                            <option value="cross-sell">Cross-Sell</option>
-                                            <option value="renewal">Renewal and Expansion</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                                            <DollarSign className="w-4 h-4" />
-                                            Incumbent Price
-                                        </label>
-                                        <input
-                                            type="number"
-                                            value={incumbentPrice}
-                                            onChange={(e) => setIncumbentPrice(e.target.value)}
-                                            placeholder="Enter incumbent price"
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition"
-                                            step="0.01"
-                                            min="0"
-                                        />
-                                    </div>
-
-                                    {/* Row 3: Contract Date and Non-Incumbent Price */}
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                                            <Calendar className="w-4 h-4" />
-                                            Original Contract Date
-                                        </label>
-                                        <input
-                                            type="date"
-                                            value={contractDate}
-                                            onChange={(e) => setContractDate(e.target.value)}
-                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition appearance-none"
-                                            style={{ minHeight: '48px' }}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                                            <DollarSign className="w-4 h-4" />
-                                            Non-Incumbent Price
-                                        </label>
-                                        <div className={`w-full px-4 py-3 border-2 rounded-lg flex items-center ${result ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-gray-200'}`}>
-                                            {result ? (
-                                                <span className="text-2xl font-bold text-green-700">
-                                                    {formatCurrency(result.nonIncumbentPrice)}
-                                                </span>
-                                            ) : (
-                                                <span className="text-gray-400 italic">Fill all fields above</span>
-                                            )}
-                                        </div>
-                                        {result && result.isLegacy && (
-                                            <p className="mt-1 text-xs text-amber-700 font-semibold">
-                                                ⚠️ Legacy deal (before Feb 9, 2026)
-                                            </p>
-                                        )}
-                                        {result && (
-                                            <p className="mt-1 text-xs text-gray-600">
-                                                {result.discountRate}% price protection applied
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Partner Positioning Language */}
-                                {result && (
-                                    <div className="mt-8 p-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg border-2 border-purple-200 shadow-md">
-                                        <h3 className="font-semibold text-purple-900 mb-4 flex items-center gap-2 text-lg">
-                                            <Award className="w-5 h-5" />
-                                            Partner Positioning Language
-                                        </h3>
-                                        
-                                        <div className="space-y-6">
-                                            {/* Non-Incumbent Partner Framing */}
-                                            <div className="bg-white p-4 rounded-lg border border-purple-200">
-                                                <h4 className="font-semibold text-purple-900 mb-2 text-sm uppercase tracking-wide">
-                                                    If another (non-incumbent) partner asks for pricing:
-                                                </h4>
-                                                <p className="text-gray-800 text-sm leading-relaxed">
-                                                    Quote no lower than <span className="font-bold text-green-700">{formatCurrency(result.nonIncumbentPrice)}</span> per license ({result.discountRate}% price protection applied).
-                                                </p>
-                                            </div>
-
-                                            {/* Incumbent Partner Framing */}
-                                            <div className="bg-white p-4 rounded-lg border border-purple-200">
-                                                <h4 className="font-semibold text-purple-900 mb-2 text-sm uppercase tracking-wide">
-                                                    Incumbent Partner Framing:
-                                                </h4>
-                                                <p className="text-gray-800 text-sm leading-relaxed italic">
-                                                    "You're priced at <span className="font-bold text-blue-700">{formatCurrency(result.incumbentPrice)}</span> with {result.discountRate}% protection, so you're covered up to about <span className="font-bold text-green-700">{formatCurrency(result.nonIncumbentPrice)}</span>. Even if the district comes to us directly, we won't go under your protected level. And of course, if anything ever feels off-track in the account, we'll connect with you so we're aligned on the right next steps."
-                                                </p>
-                                            </div>
-
-                                            {/* Non-Incumbent Partner Framing */}
-                                            <div className="bg-white p-4 rounded-lg border border-purple-200">
-                                                <h4 className="font-semibold text-purple-900 mb-2 text-sm uppercase tracking-wide">
-                                                    Non-Incumbent Partner Framing:
-                                                </h4>
-                                                <p className="text-gray-800 text-sm leading-relaxed italic">
-                                                    "We have an existing partner relationship with this account. To maintain fairness across our partner ecosystem, the floor price we can offer is <span className="font-bold text-green-700">{formatCurrency(result.nonIncumbentPrice)}</span> per license. This ensures we're supporting all our partners equitably while giving you a competitive opportunity to earn the business."
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Pricing Rules */}
-                                <div className="mt-8 p-6 bg-blue-50 rounded-lg border-2 border-blue-200">
-                                    <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                            {result && (
+                                <div className="mt-8 p-6 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-purple-200 dark:border-purple-800 shadow-md">
+                                    <h3 className="font-semibold text-purple-900 dark:text-purple-300 mb-4 flex items-center gap-2 text-lg">
                                         <Award className="w-5 h-5" />
-                                        Partner Pricing Rules
+                                        Partner Positioning Language
                                     </h3>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <h4 className="font-semibold text-blue-900 mb-2">Enterprise Partners (CDW)</h4>
-                                            <ul className="space-y-1 text-sm text-blue-800 ml-4">
-                                                <li>• New Logo/Cross-Sell: 25% price protection</li>
-                                                <li>• Renewals and Expansions: 20% price protection</li>
-                                                <li>• Legacy Deals: 15% price protection</li>
-                                            </ul>
+                                    
+                                    <div className="space-y-6">
+                                        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                                            <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2 text-sm uppercase tracking-wide">
+                                                If another (non-incumbent) partner asks for pricing:
+                                            </h4>
+                                            <p className="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">
+                                                Quote no lower than <span className="font-bold text-green-700 dark:text-green-400">{formatCurrency(result.nonIncumbentPrice)}</span> per license ({result.discountRate}% price protection applied).
+                                            </p>
                                         </div>
-                                        <div>
-                                            <h4 className="font-semibold text-blue-900 mb-2">Growth Partners (Trafera, Bluum, SHI, Howard, BorderLAN, OETC, UDT)</h4>
-                                            <ul className="space-y-1 text-sm text-blue-800 ml-4">
-                                                <li>• New Logo/Cross-Sell: 25% price protection</li>
-                                                <li>• Renewals and Expansions: 20% price protection</li>
-                                                <li>• Legacy Deals: 15% price protection</li>
-                                            </ul>
+
+                                        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                                            <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2 text-sm uppercase tracking-wide">
+                                                Incumbent Partner Framing:
+                                            </h4>
+                                            <p className="text-gray-800 dark:text-gray-100 text-sm leading-relaxed italic">
+                                                "You're priced at <span className="font-bold text-blue-700 dark:text-blue-400">{formatCurrency(result.incumbentPrice)}</span> with {result.discountRate}% protection, so you're covered up to about <span className="font-bold text-green-700 dark:text-green-400">{formatCurrency(result.nonIncumbentPrice)}</span>. Even if the district comes to us directly, we won't go under your protected level. And of course, if anything ever feels off-track in the account, we'll connect with you so we're aligned on the right next steps."
+                                            </p>
                                         </div>
-                                        <div>
-                                            <h4 className="font-semibold text-blue-900 mb-2">Territory Partners (Connection, Fortnet Security, Journey Ed, and more)</h4>
-                                            <ul className="space-y-1 text-sm text-blue-800 ml-4">
-                                                <li>• New Logo/Cross-Sell: 20% price protection</li>
-                                                <li>• Renewals and Expansions: 15% price protection</li>
-                                                <li>• Legacy Deals: 15% price protection</li>
-                                            </ul>
+
+                                        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                                            <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2 text-sm uppercase tracking-wide">
+                                                Non-Incumbent Partner Framing:
+                                            </h4>
+                                            <p className="text-gray-800 dark:text-gray-100 text-sm leading-relaxed italic">
+                                                "We have an existing partner relationship with this account. To maintain fairness across our partner ecosystem, the floor price we can offer is <span className="font-bold text-green-700 dark:text-green-400">{formatCurrency(result.nonIncumbentPrice)}</span> per license. This ensures we're supporting all our partners equitably while giving you a competitive opportunity to earn the business."
+                                            </p>
                                         </div>
-                                        <div>
-                                            <h4 className="font-semibold text-blue-900 mb-2">Authorized Partners (All others)</h4>
-                                            <ul className="space-y-1 text-sm text-blue-800 ml-4">
-                                                <li>• All deal types: 15% price protection</li>
-                                            </ul>
-                                        </div>
-                                        <p className="text-xs text-blue-700 italic mt-3">
-                                            * Legacy deals are contracts that began before February 9, 2026
-                                        </p>
                                     </div>
                                 </div>
+                            )}
 
+                            <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+                                <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
+                                    <Award className="w-5 h-5" />
+                                    Partner Pricing Rules
+                                </h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Enterprise Partners (CDW)</h4>
+                                        <ul className="space-y-1 text-sm text-blue-800 dark:text-blue-300 ml-4">
+                                            <li>• New Logo/Cross-Sell: 25% price protection</li>
+                                            <li>• Renewals and Expansions: 20% price protection</li>
+                                            <li>• Legacy Deals: 15% price protection</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Growth Partners (Trafera, Bluum, SHI, Howard, BorderLAN, OETC, UDT)</h4>
+                                        <ul className="space-y-1 text-sm text-blue-800 dark:text-blue-300 ml-4">
+                                            <li>• New Logo/Cross-Sell: 25% price protection</li>
+                                            <li>• Renewals and Expansions: 20% price protection</li>
+                                            <li>• Legacy Deals: 15% price protection</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Territory Partners (Connection, Fortnet Security, Journey Ed, and more)</h4>
+                                        <ul className="space-y-1 text-sm text-blue-800 dark:text-blue-300 ml-4">
+                                            <li>• New Logo/Cross-Sell: 20% price protection</li>
+                                            <li>• Renewals and Expansions: 15% price protection</li>
+                                            <li>• Legacy Deals: 15% price protection</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Authorized Partners (All others)</h4>
+                                        <ul className="space-y-1 text-sm text-blue-800 dark:text-blue-300 ml-4">
+                                            <li>• All deal types: 15% price protection</li>
+                                        </ul>
+                                    </div>
+                                    <p className="text-xs text-blue-700 dark:text-blue-400 italic mt-3">
+                                        * Legacy deals are contracts that began before February 9, 2026
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            );
-        }
+            </div>
+        );
+    }
 
-        ReactDOM.render(<PricingCalculator />, document.getElementById('root'));
-    </script>
+    ReactDOM.render(<PricingCalculator />, document.getElementById('root'));
+</script>
 
-    <!-- Install Prompt -->
-    <div id="installPrompt" class="install-prompt">
-        <p style="margin: 0 0 12px 0; font-weight: 600; color: #1f2937;">Install App</p>
-        <p style="margin: 0 0 12px 0; color: #4b5563; font-size: 14px;">Add to your home screen for quick access</p>
-        <div style="display: flex; gap: 8px;">
-            <button id="installBtn" style="background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Install</button>
-            <button id="dismissBtn" style="background: #e5e7eb; color: #374151; padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Not Now</button>
-        </div>
+<div id="installPrompt" class="install-prompt">
+    <p style="margin: 0 0 12px 0; font-weight: 600; color: #1f2937;">Install App</p>
+    <p style="margin: 0 0 12px 0; color: #4b5563; font-size: 14px;">Add to your home screen for quick access</p>
+    <div style="display: flex; gap: 8px;">
+        <button id="installBtn" style="background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Install</button>
+        <button id="dismissBtn" style="background: #e5e7eb; color: #374151; padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Not Now</button>
     </div>
+</div>
 
-    <!-- Service Worker Registration -->
-    <script>
-        // Register service worker for PWA functionality
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker registered successfully:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('Service Worker registration failed:', error);
-                    });
-            });
-        }
-
-        // PWA install prompt
-        let deferredPrompt;
-        const installPrompt = document.getElementById('installPrompt');
-        const installBtn = document.getElementById('installBtn');
-        const dismissBtn = document.getElementById('dismissBtn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
-            e.preventDefault();
-            // Stash the event so it can be triggered later
-            deferredPrompt = e;
-            // Show custom install prompt
-            installPrompt.classList.add('show');
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('SW registered'))
+                .catch(err => console.log('SW failed', err));
         });
+    }
 
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                // Show the install prompt
-                deferredPrompt.prompt();
-                // Wait for the user to respond to the prompt
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`User response to the install prompt: ${outcome}`);
-                // Clear the deferredPrompt
-                deferredPrompt = null;
-                // Hide the install prompt
-                installPrompt.classList.remove('show');
-            }
-        });
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+    const installBtn = document.getElementById('installBtn');
+    const dismissBtn = document.getElementById('dismissBtn');
 
-        dismissBtn.addEventListener('click', () => {
-            installPrompt.classList.remove('show');
-        });
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installPrompt.classList.add('show');
+    });
 
-        // Hide prompt after app is installed
-        window.addEventListener('appinstalled', () => {
-            installPrompt.classList.remove('show');
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
             deferredPrompt = null;
-            console.log('PWA was installed');
-        });
-    </script>
+            installPrompt.classList.remove('show');
+        }
+    });
+
+    dismissBtn.addEventListener('click', () => {
+        installPrompt.classList.remove('show');
+    });
+
+    window.addEventListener('appinstalled', () => {
+        installPrompt.classList.remove('show');
+        deferredPrompt = null;
+    });
+</script>
+```
+
 </body>
 </html>
