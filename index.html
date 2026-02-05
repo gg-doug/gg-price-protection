@@ -38,6 +38,34 @@
                 font-size: 16px !important;
             }
         }
+        /* Dark mode variables */
+        :root {
+            --bg-primary: #f3f4f6;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f9fafb;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --border-color: #d1d5db;
+            --header-bg: linear-gradient(to right, #2563eb, #4f46e5);
+        }
+        [data-theme="dark"] {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-tertiary: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: #4b5563;
+            --header-bg: linear-gradient(to right, #1e40af, #3730a3);
+        }
+        body {
+            transition: background-color 0.3s ease;
+        }
+        [data-theme="dark"] input[type="date"],
+        [data-theme="dark"] input[type="number"],
+        [data-theme="dark"] select {
+            background-color: #374151 !important;
+            color: #f9fafb !important;
+        }
         /* PWA install prompt styling */
         .install-prompt {
             position: fixed;
@@ -55,13 +83,17 @@
         .install-prompt.show {
             display: block;
         }
+        [data-theme="dark"] .install-prompt {
+            background: #1f2937;
+            color: #f9fafb;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
 
         // Lucide Icons as inline SVGs
         const Calculator = ({ className }) => (
@@ -111,11 +143,48 @@
             </svg>
         );
 
+        const Moon = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        );
+
+        const Sun = ({ className }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+        );
+
         function PricingCalculator() {
             const [partner, setPartner] = useState('');
             const [incumbentPrice, setIncumbentPrice] = useState('');
             const [contractDate, setContractDate] = useState('');
             const [dealType, setDealType] = useState('new-logo');
+            const [darkMode, setDarkMode] = useState(() => {
+                const saved = localStorage.getItem('darkMode');
+                return saved === 'true';
+            });
+
+            useEffect(() => {
+                if (darkMode) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
+                localStorage.setItem('darkMode', darkMode);
+            }, [darkMode]);
+
+            const toggleDarkMode = () => {
+                setDarkMode(!darkMode);
+            };
 
             // Partner tier mapping
             const partnerTiers = {
@@ -239,17 +308,26 @@
             };
 
             return (
-                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+                <div className="min-h-screen p-8" style={{ background: 'var(--bg-primary)', transition: 'background-color 0.3s ease' }}>
                     <div className="max-w-4xl mx-auto">
-                        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                        <div className="rounded-2xl shadow-2xl overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
                             {/* Header */}
-                            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white">
+                            <div style={{ background: 'var(--header-bg)' }} className="p-8 text-white">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-3">
                                         <Calculator className="w-8 h-8" />
                                         <h1 className="text-3xl font-bold">GoGuardian Price Protection Calculator</h1>
                                     </div>
-                                    <div className="text-blue-100 text-sm font-semibold">v1.15</div>
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={toggleDarkMode}
+                                            className="p-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition"
+                                            aria-label="Toggle dark mode"
+                                        >
+                                            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                                        </button>
+                                        <div className="text-blue-100 text-sm font-semibold">v1.20</div>
+                                    </div>
                                 </div>
                                 <p className="text-blue-100 mb-3">Calculate competitive pricing with partner tier discounts</p>
                                 <p className="text-blue-200 text-sm italic leading-relaxed">
